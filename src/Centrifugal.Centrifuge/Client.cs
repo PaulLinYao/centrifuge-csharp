@@ -2914,5 +2914,14 @@ namespace Centrifugal.Centrifuge
             _refreshTimer?.Dispose();
             _commandBatchTimer?.Dispose();
         }
+
+        /// <summary>Completes once the steps queued before it ran (for tests).</summary>
+        internal Task LoopBarrierAsync()
+        {
+            var done = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            // Loop.Invoke(() => Loop.Complete(() => done.TrySetResult(true)));
+            return done.Task;
+        }
+
     }
 }

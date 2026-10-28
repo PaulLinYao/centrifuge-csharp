@@ -13,6 +13,8 @@ namespace Centrifugal.Centrifuge
     {
         private static readonly Random Random = new Random();
 
+        /// <summary>Largest interval accepted by timers on all supported runtimes.</summary>
+        public static readonly TimeSpan MaxTimerInterval = TimeSpan.FromMilliseconds(int.MaxValue);
         /// <summary>
         /// Calculates backoff delay with full jitter.
         /// Full jitter technique from: https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/
@@ -69,6 +71,17 @@ namespace Centrifugal.Centrifuge
 
             return (int)Math.Max(1, ms);
         }
+
+        /// <summary>
+        /// How long to wait for a server ping, in milliseconds: the ping interval (given in seconds) plus
+        /// <paramref name="maxDelay"/>. Capped at <see cref="int.MaxValue"/> to remain a valid Timer due time.
+        /// </summary>
+        public static int PingDeadlineMilliseconds(uint pingInterval, TimeSpan maxDelay)
+        {
+            double ms = (double)pingInterval * 1000 + maxDelay.TotalMilliseconds;
+            return ms > int.MaxValue ? int.MaxValue : (int)ms;
+        }
+
     }
 
     /// <summary>
